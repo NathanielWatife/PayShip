@@ -130,6 +130,6 @@ backend/
 4. Push to branch
 5. Open pull request
 
-<!-- ## Contact -->
-- Project Repository: [\[GitHub Link\]](https://github.com/Jeyrio/logic)
+## Contact
+- Project Repository: [\[GitHub Link\]](https://github.com/Jeyrio/PayShip.git)
 
