@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackLogic - Profile</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <!-- Logo on the Left -->
+        <div class="logo">
+            <a href="index.html">                
+                <img src="img/Logistics Logo.jpeg" alt="TrackLogic Logo" width="40" height="40">
+            </a>
+        </div>
+
+        <!-- Hamburger menu button -->
+         <button class="mobile-nav-toggle" aria-controls="nav-container" aria-expanded="false">
+            <span class="sr-only">Menu</span>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+         </button>
+
+        <!-- Navigation Container -->
+        <nav class="nav-container">
+            <!-- Navigation menu links in the middle -->
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="support.html">Contact</a></li>
+                
+                <!-- For Service dropdown -->
+                 <li class="dropdown">
+                    <a class="dropdown-toggle">Services</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="shipnow.html">Ship now</a></li>
+                        <li><a href="#interstate shipping">Interstate shipping</a></li>
+                        <li><a href="track.html">Track me</a></li>
+                        <li><a href="support.html">Support</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Authentication buttons on the right -->
+            <div class="auth-buttons">
+                <button class="btn btn-outline"><a href="login.html">Log In</a></button>
+                <button class="btn btn-primary"><a href="signup.html">Sign Up</a></button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="profile-main">
+        <div class="profile-card">
+            <h1>Your Profile</h1>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </form>
+
+            <h2>Change Password</h2>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <input type="password" id="current-password" placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" placeholder="Enter new password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password">Confirm New Password</label>
+                    <input type="password" id="confirm-new-password" placeholder="Confirm new password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Change Password</button>
+            </form>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Footer Logo and Description -->
+            <div class="footer-section">
+                <img src="img/Logistics Logo.jpeg" alt="TrackLogic Logo" class="footer-logo">
+                <p>TrackLogic is your trusted logistics partner, ensuring fast, reliable, and affordable deliveries nationwide.</p>
+            </div>
+    
+            <!-- Quick Links -->
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="support.html">Services</a></li>
+                    
+                </ul>
+            </div>
+    
+            <!-- Contact Info -->
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <p>Email: <a href="mailto:support@tracklogic.com">support@tracklogic.com</a></p>
+                <p>Phone: <a href="tel:+2347000000000">+234 700 000 0000</a></p>
+                <p>Address: Lagos, Nigeria</p>
+            </div>
+
+        </div>
+    
+        <!-- Copyright Notice -->
+        <div class="footer-bottom">
+            <p>&copy; 2025 TrackLogic. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="js/scripts.js" defer></script>
+</body>
+</html>
