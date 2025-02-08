@@ -1,147 +1,119 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/authMiddleware');
 const Package = require('../models/Package');
-const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
+const crypto = require('crypto');
+
+
 const router = express.Router();
 
-const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET;
+const CRYPTOMUS_API_KEY = process.env.CRYPTOMUS_API_KEY;
+const MERCHANT_UUID = process.env.CRYPTOMUS_MERCHANT_UUID;
+const CALLBACK_SECRET = process.env.CRYPTOMUS_CALLBACK_SECRET;
 
-// Paystack Payment Initialization
-router.post('/paystack/:packageId', authMiddleware, async (req, res) => {
+
+const BASE_URL = 'https://api.cryptomus.com/v1';
+
+/**
+ * @route POST /api/payment/create
+ * @desc Initiate a Cryptomus payment
+ * @access Private (Authenticated Users)
+ */
+router.post('/create', authMiddleware, async (req, res) => {
     try {
-        const package = await Package.findOne({ packageId: req.params.packageId, userId: req.user.id });
+        const { packageId } = req.body;
+        const user = req.user;
+
+        // Fetch package details
+        const package = await Package.findOne({ packageId, userId: user.id });
         if (!package) {
             return res.status(404).json({ message: 'Package not found' });
         }
 
-        const paystackResponse = await axios.post(
-            'https://api.paystack.co/transaction/initialize',
-            {
-                email: req.user.email,
-                amount: package.price * 100, // Convert to Kobo
-                reference: package.packageId, // Unique reference ID
-                callback_url: 'http://localhost:5000/api/payment/paystack/callback',
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${PAYSTACK_SECRET}`,
-                },
-            }
-        );
+        const paymentData = {
+            merchant: MERCHANT_UUID,
+            amount: package.price.toFixed(2), // Ensure it's in decimal format
+            currency: 'USD', // Adjust currency if needed
+            order_id: package.packageId, // Use packageId as the transaction reference
+            url_return: `${process.env.FRONTEND_URL}/payment-success.html`, // Redirect after payment
+            url_callback: `${process.env.BACKEND_URL}/api/payment/callback`, // Webhook URL
+        };
 
-        res.json({
-            message: 'Paystack payment initialized',
-            authorization_url: paystackResponse.data.data.authorization_url,
-        });
-    } catch (err) {
-        console.error('Error initializing Paystack payment:', err.message);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
+        // Generate HMAC signature
+        const signature = crypto
+            .createHmac('sha256', CRYPTOMUS_API_KEY)
+            .update(JSON.stringify(paymentData))
+            .digest('hex');
 
-// Paystack Callback
-router.post('/paystack/callback', async (req, res) => {
-    try {
-        const { reference } = req.body;
-
-        // Verify transaction with Paystack
-        const verifyResponse = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
+        // Make API request to Cryptomus
+        const response = await axios.post(`${BASE_URL}/payment`, paymentData, {
             headers: {
-                Authorization: `Bearer ${PAYSTACK_SECRET}`,
+                'Content-Type': 'application/json',
+                'merchant': MERCHANT_UUID,
+                'sign': signature,
             },
         });
 
-        const data = verifyResponse.data.data;
-        if (data.status === 'success') {
-            // Update payment status in database
-            const package = await Package.findOneAndUpdate(
-                { packageId: reference },
-                { $set: { 'payment.status': 'Paid', 'payment.paymentDate': new Date() } },
-                { new: true }
-            );
-
-            if (package) {
-                console.log('Payment verified and updated for package:', package.packageId);
-                return res.json({ message: 'Payment verified successfully' });
-            }
-
-            return res.status(404).json({ message: 'Package not found' });
+        // If successful, return payment URL
+        if (response.data.result) {
+            return res.json({
+                message: 'Cryptomus payment initiated successfully.',
+                payment_url: response.data.result.url,
+            });
         }
 
-        res.status(400).json({ message: 'Payment verification failed' });
+        return res.status(400).json({ message: 'Failed to initiate payment.' });
+
     } catch (err) {
-        console.error('Error verifying payment:', err.message);
-        res.status(500).json({ message: 'Server Error' });
+        console.error('Error initiating Cryptomus payment:', err.message);
+        res.status(500).json({ message: 'Server Error', error: err.message });
     }
 });
 
-// Initiate Payment
-router.post('/initiate/:packageId', authMiddleware, async (req, res) => {
-    const { method } = req.body;
-
-    if (!['BankTransfer', 'USSD', 'Paystack'].includes(method)) {
-        return res.status(400).json({ message: 'Invalid payment method' });
-    }
-
+/**
+ * @route POST /api/payment/callback
+ * @desc Handle Cryptomus payment callbacks
+ * @access Public (Webhook)
+ */
+router.post('/callback', async (req, res) => {
     try {
-        const package = await Package.findOne({ packageId: req.params.packageId, userId: req.user.id });
+        const callbackData = req.body;
+        const providedSignature = req.headers['sign']; // Cryptomus provides this
+
+        // Verify the callback signature
+        const generatedSignature = crypto
+            .createHmac('sha256', CRYPTOMUS_CALLBACK_SECRET)
+            .update(JSON.stringify(callbackData))
+            .digest('hex');
+
+        if (providedSignature !== generatedSignature) {
+            return res.status(403).json({ message: 'Invalid callback signature' });
+        }
+
+        const { order_id, status } = callbackData;
+
+        // Fetch package
+        const package = await Package.findOne({ packageId: order_id });
         if (!package) {
             return res.status(404).json({ message: 'Package not found' });
         }
 
-        const transactionId = uuidv4(); // Generate unique transaction ID
-        package.payment.method = method;
-        package.payment.transactionId = transactionId;
-        package.payment.status = 'Pending';
-        package.payment.timestamp = new Date();
-        await package.save();
-
-        res.json({
-            message: 'Payment initiated successfully',
-            paymentDetails: {
-                method,
-                transactionId,
-                status: package.payment.status,
-            },
-        });
-    } catch (err) {
-        console.error('Error initiating payment:', err.message);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
-
-// Update Payment Status
-router.put('/status/:packageId', authMiddleware, async (req, res) => {
-    const { status, transactionId } = req.body;
-
-    if (!['Pending', 'Paid', 'Failed'].includes(status)) {
-        return res.status(400).json({ message: 'Invalid payment status' });
-    }
-
-    try {
-        const package = await Package.findOne({ packageId: req.params.packageId, userId: req.user.id });
-        if (!package) {
-            return res.status(404).json({ message: 'Package not found' });
+        // Update payment status based on Cryptomus response
+        if (status === 'paid') {
+            package.payment.status = 'Paid';
+            package.payment.paymentDate = new Date();
+            await package.save();
+            console.log(`Payment successful for Package: ${package.packageId}`);
+        } else if (status === 'failed') {
+            package.payment.status = 'Failed';
+            await package.save();
+            console.log(`Payment failed for Package: ${package.packageId}`);
         }
 
-        if (transactionId && package.payment.transactionId !== transactionId) {
-            return res.status(400).json({ message: 'Invalid transaction ID' });
-        }
+        return res.status(200).json({ message: 'Payment callback processed successfully' });
 
-        package.payment.status = status;
-        await package.save();
-
-        res.json({
-            message: 'Payment updated successfully',
-            paymentDetails: {
-                status: package.payment.status,
-                method: package.payment.method,
-                transactionId: package.payment.transactionId,
-            },
-        });
     } catch (err) {
-        console.error('Error updating payment status:', err.message);
+        console.error('Error processing Cryptomus callback:', err.message);
         res.status(500).json({ message: 'Server Error' });
     }
 });

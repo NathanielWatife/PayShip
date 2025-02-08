@@ -23,6 +23,7 @@ const io = socketIo(server);
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ exten }))
 app.use(cors());
 app.use(helmet());
 
