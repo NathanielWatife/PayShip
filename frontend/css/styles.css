@@ -607,10 +607,62 @@ table button {
     flex-direction: column;
     gap: 20px;
 }
+/* Flexbox container for the two dropdowns */
+.form-row {
+    display: flex; /* Use Flexbox to put the on the same line vertically*/
+    gap: 30px; /* Space between the two dropdowns */
+}
 
+/* Style for each form group */
+.form-group{
+    flex: 1; /* Each form group takes equal space */
+    display: flex;
+    flex-direction: column; /* Stack label and dropdown vertically */
+}
 
+/* Style for dropdowns */
+.form-group select {
+    padding: 10px;
+    border:  1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%; /* Full width of the parent container */
+}
 
+/* Center the button and make it longer */
+.form-submit{
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+    margin-top: 50px; /* Add some space above the button */
+}
 
+.form-submit .btn {
+    width: 50%;
+    max-width: 300px;
+    padding: 13px;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Wallet address styles */
+.wallet-address {
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.wallet-address input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.wallet-address label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    display: block;
+}
 
 
 
@@ -853,6 +905,7 @@ table button {
     margin-bottom: 5px;
     font-size: 0.9rem;
     color: #555;
+    font-weight: bold;
 }
 
 .form-group input {
@@ -876,7 +929,7 @@ table button {
     padding: 10px 20px;
     font-size: 1rem;
     border-radius: 5px;
-    /* cursor: pointer; */
+    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
