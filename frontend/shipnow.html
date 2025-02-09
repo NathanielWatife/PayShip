@@ -69,7 +69,6 @@
                 <input type="number" id="package-weight" placeholder="Enter weight in kg" required>
             </div>
             <div>
-                <!-- Form row for Transit Type and Payment Method -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="transit-type">Transit Type</label>
@@ -82,7 +81,6 @@
                         </select>
                     </div>
                     
-                    <!-- New Payment Method Dropdown -->
                     <div class="form-group">
                         <label for="payment-method">Payment Method</label>
                         <select id="payment-method" required>
@@ -93,15 +91,15 @@
                         </select>
                     </div>
                 </div>
-
-                <!-- Wallet Address (Only for Cryptocurrency) -->
+                <!-- Add this new div for wallet address -->
                  <div class="form-group wallet-address" style="display: none;">
                     <label for="wallet-address">Wallet Address</label>
                     <input type="text" id="wallet-address" placeholder="Enter your wallet address">
-                 </div>
+                </div>
 
+                <!-- Centered and longer button -->
                  <div class="form-submit">
-                    <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+                    <button type="submit" class="btn btn-primary">Pay</button>
                 </div>
             </form>
         </main>

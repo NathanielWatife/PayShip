@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayShip - Payment</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">                
+                <img src="img/Logistics Logo.jpeg" alt="TrackLogic Logo" width="40" height="40">
+            </a>
+        </div>
+    </header>
+
+    <main class="payment-main">
+        <h1>Confirm Your Payment</h1>
+        <div id="payment-details">
+            <p><strong>Pickup Address:</strong> <span id="pickup-address"></span></p>
+            <p><strong>Delivery Address:</strong> <span id="delivery-address"></span></p>
+            <p><strong>Package Weight:</strong> <span id="package-weight"></span> kg</p>
+            <p><strong>Transit Type:</strong> <span id="transit-type"></span></p>
+            <p><strong>Payment Method:</strong> <span id="payment-method"></span></p>
+            <p id="wallet-section" style="display: none;"><strong>Wallet Address:</strong> <span id="wallet-address"></span></p>
+        </div>
+
+        <button id="confirm-payment" class="btn btn-primary">Proceed with Payment</button>
+    </main>
+
+    <script src="js/payment.js"></script>
+</body>
+</html>

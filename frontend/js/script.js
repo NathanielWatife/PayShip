@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:5000/api/auth'; // Backend base URL
+// // Backend base URL
+const BASE_URL = 'http://localhost:5000/api/auth'; 
 
 /************ Authentication Utilities ************/
 // Check if the user is authenticated
@@ -16,14 +17,14 @@ function isAuthenticated() {
     }
 }
 
+// Redirect to login if user is not authenticated
 function requireAuth() {
-  if (!isAuthenticated()) {
-      console.log('Token expired or unauthorized. Logging out.');
-      localStorage.removeItem('token'); // Ensure expired token is cleared
-      window.location.href = 'login.html'; // Redirect to login
-  }
+    if (!isAuthenticated()) {
+        console.log('Token expired or unauthorized. Logging out.');
+        localStorage.removeItem('token'); // Ensure expired token is cleared
+        window.location.href = 'login.html'; // Redirect to login
+    }
 }
-
 
 // Redirect logged-in users away from login/signup
 function redirectAuthenticatedUsers() {
@@ -34,12 +35,10 @@ function redirectAuthenticatedUsers() {
 }
 
 // Global authentication checks
-// document.addEventListener('DOMContentLoaded', () => {
-//     requireAuth(); // Protect authenticated pages
-//     redirectAuthenticatedUsers(); // Redirect logged-in users on login/signup pages
-// });
-
-/************ END Authentication Utilities ************/
+document.addEventListener('DOMContentLoaded', () => {
+    requireAuth(); // Protect authenticated pages
+    redirectAuthenticatedUsers(); // Redirect logged-in users on login/signup pages
+});
 
 /************ SIGNUP ************/
 document.getElementById('signup-form')?.addEventListener('submit', async (event) => {
@@ -52,6 +51,7 @@ document.getElementById('signup-form')?.addEventListener('submit', async (event)
     const password = document.getElementById('password').value.trim();
 
     try {
+        clearError();
         const response = await fetch(`${BASE_URL}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -60,32 +60,28 @@ document.getElementById('signup-form')?.addEventListener('submit', async (event)
 
         const data = await response.json();
         if (response.ok) {
-            // Redirect to login
-            window.location.href = 'login.html';
+            window.location.href = 'login.html'; // Redirect to login
         } else {
-            // Show error message
-            document.getElementById('loader-text').textContent = data.message || 'Failed to sign up. Please try again.';
+            showError(data.message || 'Failed to sign up. Please try again.');
         }
     } catch (err) {
         console.error('Error during signup:', err.message);
-        document.getElementById('loader-text').textContent = 'An error occurred. Please try again later.';
+        showError('An error occurred. Please try again later.');
     } finally {
-        // Hide the loader after a short delay (optional)
-        setTimeout(hideLoader, 1500);
+        setTimeout(hideLoader, 1500); // Delay to allow UI update
     }
 });
-
-/************ SIGNUP END ************/
 
 /************ LOGIN ************/
 document.getElementById('login-form')?.addEventListener('submit', async (event) => {
     event.preventDefault(); // Prevent form submission
-    showLoader('Logging you in...'); // Show loader with message
+    showLoader('Logging you in...');
 
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
     try {
+        clearError();
         const response = await fetch(`${BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -94,29 +90,23 @@ document.getElementById('login-form')?.addEventListener('submit', async (event) 
 
         const data = await response.json();
         if (response.ok) {
-            // Save token and redirect to the homepage
             localStorage.setItem('token', data.token);
-            window.location.href = 'index.html';
+            window.location.href = 'index.html'; // Redirect to homepage
         } else {
-            // Show error message
-            document.getElementById('loader-text').textContent = data.message || 'Failed to log in. Please try again.';
+            showError(data.message || 'Invalid email or password.');
         }
     } catch (err) {
         console.error('Error during login:', err.message);
-        document.getElementById('loader-text').textContent = 'An error occurred. Please try again later.';
+        showError('An error occurred. Please try again later.');
     } finally {
-        // Hide the loader after a short delay (optional)
         setTimeout(hideLoader, 1500);
     }
 });
 
-/************ LOGIN END ************/
-
 /************ LOGOUT ************/
 document.getElementById('logout')?.addEventListener('click', () => {
     localStorage.removeItem('token');
-    alert('You have been logged out.');
-    window.location.href = 'login.html';
+    window.location.href = 'login.html'; // Redirect to login page
 });
 /************ LOGOUT END ************/
 
@@ -242,8 +232,6 @@ function showError(message) {
     if (errorSection) {
         errorSection.textContent = message;
         errorSection.classList.remove('hidden');
-    } else {
-        alert(message);
     }
 }
 
@@ -255,15 +243,13 @@ function clearError() {
     }
 }
 
-
-// Show Loader
 // Show Loader with a Message
 function showLoader(message = 'Loading...') {
     const loader = document.getElementById('loader');
     const loaderText = document.getElementById('loader-text');
     if (loader && loaderText) {
-        loaderText.textContent = message; // Update the loading message
-        loader.classList.remove('hidden'); // Show the loader
+        loaderText.textContent = message;
+        loader.classList.remove('hidden');
     }
 }
 
@@ -271,8 +257,9 @@ function showLoader(message = 'Loading...') {
 function hideLoader() {
     const loader = document.getElementById('loader');
     if (loader) {
-        loader.classList.add('hidden'); // Hide the loader
+        loader.classList.add('hidden');
     }
 }
+
 
 /************ END HELPER FUNCTIONS ************/
