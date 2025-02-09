@@ -8,9 +8,9 @@ function isAuthenticated() {
     if (!token) return false;
 
     try {
-        const payload = JSON.parse(atob(token.split('.')[1])); // Decode token payload
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-        return payload.exp > currentTime; // Token is valid if expiry is in the future
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000); 
+        return payload.exp > currentTime; 
     } catch (err) {
         console.error('Error decoding token:', err);
         return false;
@@ -19,9 +19,12 @@ function isAuthenticated() {
 
 // Redirect to login if user is not authenticated
 function requireAuth() {
+    const currentPage = window.location.pathname.split('/').pop();
+
+    if (['login.html', 'signup.html'].includes(currentPage)) return;
     if (!isAuthenticated()) {
-        console.log('Token expired or unauthorized. Logging out.');
-        localStorage.removeItem('token'); // Ensure expired token is cleared
+        // console.log('Token expired or unauthorized. Logging out.');
+        localStorage.removeItem('token');
         window.location.href = 'login.html'; // Redirect to login
     }
 }
@@ -29,7 +32,7 @@ function requireAuth() {
 // Redirect logged-in users away from login/signup
 function redirectAuthenticatedUsers() {
     const currentPage = window.location.pathname.split('/').pop();
-    if (isAuthenticated() && ['login.html', 'signup.html'].includes(currentPage)) {
+    if (isAuthenticated() && ['signup.html'].includes(currentPage)) {
         window.location.href = 'index.html';
     }
 }

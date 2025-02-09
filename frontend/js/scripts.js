@@ -312,52 +312,54 @@ function handleContactForm() {
 }
 handleContactForm();
 
+});
 
 
 
 // ============== WALLET ADDRESS ==================
+document.addEventListener('DOMContentLoaded', () => {
+  const shipmentForm = document.getElementById('shipment-form');
+  const paymentMethod = document.getElementById('payment-method');
+  const walletAddressField = document.querySelector('.wallet-address');
 
-document.addEventListener("DOMContentLoaded", () => {
-// Get the payment method select element
-const paymentMethodSelect = document.getElementById('payment-method');
-// Get the wallet address div
-const walletAddressDiv = document.querySelector('.wallet-address');
-// Get the wallet address input
-const walletAddressInput = document.getElementById('wallet-address');
+  // Show/hide wallet address field based on payment selection
+  paymentMethod.addEventListener('change', () => {
+      if (paymentMethod.value === 'Cryptocurrency') {
+          walletAddressField.style.display = 'block';
+      } else {
+          walletAddressField.style.display = 'none';
+      }
+  });
 
-// Add change event listener to payment method select
-paymentMethodSelect.addEventListener('change', function() {
-  if (this.value === 'Cryptocurrency') {
-    // Show wallet address field if Cryptocurrency is selected
-    walletAddressDiv.style.display = 'block';
-    walletAddressInput.required = true;
-  } else {
-    // Hide wallet address field for other payment methods
-    walletAddressDiv.style.display = 'none';
-    walletAddressInput.required = false;
-  }
-});
+  // Handle shipment form submission and redirect to payment.html
+  shipmentForm.addEventListener('submit', (event) => {
+      event.preventDefault();
 
-// Add form submit handler
-const shipmentForm = document.getElementById('shipment-form');
-shipmentForm.addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  // Get form values
-  const formData = {
-    pickupAddress: document.getElementById('pickup-address').value,
-    deliveryAddress: document.getElementById('delivery-address').value,
-    packageWeight: document.getElementById('package-weight').value,
-    transitType: document.getElementById('transit-type').value,
-    paymentMethod: paymentMethodSelect.value,
-    walletAddress: paymentMethodSelect.value === 'Cryptocurrency' ? walletAddressInput.value : null
-  }
-  
-  // Log the form data (you can replace this with your actual form submission logic)
-  console.log('Form submitted:', formData)
-  alert('Shipment request submitted successfully!')
-})
+      const pickupAddress = document.getElementById('pickup-address').value.trim();
+      const deliveryAddress = document.getElementById('delivery-address').value.trim();
+      const weight = document.getElementById('package-weight').value.trim();
+      const transitType = document.getElementById('transit-type').value.trim();
+      const selectedPaymentMethod = paymentMethod.value.trim();
+      const walletAddress = document.getElementById('wallet-address').value.trim();
 
-})
+      if (!selectedPaymentMethod) {
+          alert("Please select a payment method.");
+          return;
+      }
 
+      // Store shipment details in localStorage to retrieve in payment.html
+      const shipmentData = {
+          pickupAddress,
+          deliveryAddress,
+          weight,
+          transitType,
+          paymentMethod: selectedPaymentMethod,
+          walletAddress: selectedPaymentMethod === 'Cryptocurrency' ? walletAddress : ''
+      };
+
+      localStorage.setItem('shipmentData', JSON.stringify(shipmentData));
+
+      // Redirect to the payment page
+      window.location.href = 'payment.html';
+  });
 });

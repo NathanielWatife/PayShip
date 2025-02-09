@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shipmentData = JSON.parse(localStorage.getItem('shipmentData'));
+
     if (!shipmentData) {
         alert("No shipment details found. Redirecting...");
         window.location.href = "shipnow.html";
         return;
     }
 
-    // Populate the payment details
+    // Populate payment details
     document.getElementById('pickup-address').textContent = shipmentData.pickupAddress;
     document.getElementById('delivery-address').textContent = shipmentData.deliveryAddress;
     document.getElementById('package-weight').textContent = shipmentData.weight;
