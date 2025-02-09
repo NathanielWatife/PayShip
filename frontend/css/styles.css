@@ -645,13 +645,34 @@ table button {
 }
 
 /* Wallet address styles */
-.wallet-address {
-    margin-top: 20px;
+#wallet-address {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
     transition: all 0.3s ease;
 }
 
+/* Style for when the field is required but empty */
+#wallet-address:required:invalid {
+    border-color: #ff4444;
+}
+
+#wallet-address-group  {
+    opacity: 0;
+    transition: all 0.3s ease;
+    /* display: none; */
+    margin-top: 1rem;
+}
+
+#wallet-address-group.visible {
+    opacity: 1;
+}
+
 .wallet-address input {
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
@@ -659,6 +680,7 @@ table button {
 }
 
 .wallet-address label {
+    margin-top: 15px;
     margin-bottom: 8px;
     font-weight: bold;
     display: block;
