@@ -314,18 +314,4 @@ handleContactForm();
 
 
 // ============== WALLET ADDRESS ==================
-
-document.getElementById('payment-method').addEventListener('change', function() {
-  const walletGroup = document.getElementById('wallet-address-group');
-  const walletField = document.getElementById('wallet-address');
-  
-  if (this.value === 'Cryptocurrency') {
-      walletGroup.style.display = 'block';
-      walletField.required = true;
-  } else {
-      walletGroup.style.display = 'none';
-      walletField.required = false;
-  }
-});
-
-});
+ 
