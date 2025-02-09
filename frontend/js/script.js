@@ -3,114 +3,114 @@ const BASE_URL = 'http://localhost:5000/api/auth';
 
 /************ Authentication Utilities ************/
 // Check if the user is authenticated
-function isAuthenticated() {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
+// function isAuthenticated() {
+//     const token = localStorage.getItem('token');
+//     if (!token) return false;
 
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const currentTime = Math.floor(Date.now() / 1000); 
-        return payload.exp > currentTime; 
-    } catch (err) {
-        console.error('Error decoding token:', err);
-        return false;
-    }
-}
+//     try {
+//         const payload = JSON.parse(atob(token.split('.')[1]));
+//         const currentTime = Math.floor(Date.now() / 1000); 
+//         return payload.exp > currentTime; 
+//     } catch (err) {
+//         console.error('Error decoding token:', err);
+//         return false;
+//     }
+// }
 
 // Redirect to login if user is not authenticated
-function requireAuth() {
-    const currentPage = window.location.pathname.split('/').pop();
+// function requireAuth() {
+//     const currentPage = window.location.pathname.split('/').pop();
 
-    if (['login.html', 'signup.html'].includes(currentPage)) return;
-    if (!isAuthenticated()) {
-        // console.log('Token expired or unauthorized. Logging out.');
-        localStorage.removeItem('token');
-        window.location.href = 'login.html'; // Redirect to login
-    }
-}
+//     if (['login.html', 'signup.html'].includes(currentPage)) return;
+//     if (!isAuthenticated()) {
+//         // console.log('Token expired or unauthorized. Logging out.');
+//         localStorage.removeItem('token');
+//         window.location.href = 'login.html'; // Redirect to login
+//     }
+// }
 
-// Redirect logged-in users away from login/signup
-function redirectAuthenticatedUsers() {
-    const currentPage = window.location.pathname.split('/').pop();
-    if (isAuthenticated() && ['signup.html'].includes(currentPage)) {
-        window.location.href = 'index.html';
-    }
-}
+// // Redirect logged-in users away from login/signup
+// function redirectAuthenticatedUsers() {
+//     const currentPage = window.location.pathname.split('/').pop();
+//     if (isAuthenticated() && ['signup.html'].includes(currentPage)) {
+//         window.location.href = 'index.html';
+//     }
+// }
 
 // Global authentication checks
-document.addEventListener('DOMContentLoaded', () => {
-    requireAuth(); // Protect authenticated pages
-    redirectAuthenticatedUsers(); // Redirect logged-in users on login/signup pages
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     requireAuth(); // Protect authenticated pages
+//     redirectAuthenticatedUsers(); // Redirect logged-in users on login/signup pages
+// });
 
-/************ SIGNUP ************/
-document.getElementById('signup-form')?.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent form submission
-    showLoader('Creating your account...'); // Show loader with message
+// /************ SIGNUP ************/
+// document.getElementById('signup-form')?.addEventListener('submit', async (event) => {
+//     event.preventDefault(); // Prevent form submission
+//     showLoader('Creating your account...'); // Show loader with message
 
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const password = document.getElementById('password').value.trim();
+//     const name = document.getElementById('name').value.trim();
+//     const email = document.getElementById('email').value.trim();
+//     const phone = document.getElementById('phone').value.trim();
+//     const password = document.getElementById('password').value.trim();
 
-    try {
-        clearError();
-        const response = await fetch(`${BASE_URL}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, phone, password }),
-        });
+//     try {
+//         clearError();
+//         const response = await fetch(`${BASE_URL}/register`, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ name, email, phone, password }),
+//         });
 
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = 'login.html'; // Redirect to login
-        } else {
-            showError(data.message || 'Failed to sign up. Please try again.');
-        }
-    } catch (err) {
-        console.error('Error during signup:', err.message);
-        showError('An error occurred. Please try again later.');
-    } finally {
-        setTimeout(hideLoader, 1500); // Delay to allow UI update
-    }
-});
+//         const data = await response.json();
+//         if (response.ok) {
+//             window.location.href = 'login.html'; // Redirect to login
+//         } else {
+//             showError(data.message || 'Failed to sign up. Please try again.');
+//         }
+//     } catch (err) {
+//         console.error('Error during signup:', err.message);
+//         showError('An error occurred. Please try again later.');
+//     } finally {
+//         setTimeout(hideLoader, 1500); // Delay to allow UI update
+//     }
+// });
 
 /************ LOGIN ************/
-document.getElementById('login-form')?.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent form submission
-    showLoader('Logging you in...');
+// document.getElementById('login-form')?.addEventListener('submit', async (event) => {
+//     event.preventDefault(); // Prevent form submission
+//     showLoader('Logging you in...');
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+//     const email = document.getElementById('email').value.trim();
+//     const password = document.getElementById('password').value.trim();
 
-    try {
-        clearError();
-        const response = await fetch(`${BASE_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        });
+//     try {
+//         clearError();
+//         const response = await fetch(`${BASE_URL}/login`, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ email, password }),
+//         });
 
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('token', data.token);
-            window.location.href = 'index.html'; // Redirect to homepage
-        } else {
-            showError(data.message || 'Invalid email or password.');
-        }
-    } catch (err) {
-        console.error('Error during login:', err.message);
-        showError('An error occurred. Please try again later.');
-    } finally {
-        setTimeout(hideLoader, 1500);
-    }
-});
+//         const data = await response.json();
+//         if (response.ok) {
+//             localStorage.setItem('token', data.token);
+//             window.location.href = 'index.html'; // Redirect to homepage
+//         } else {
+//             showError(data.message || 'Invalid email or password.');
+//         }
+//     } catch (err) {
+//         console.error('Error during login:', err.message);
+//         showError('An error occurred. Please try again later.');
+//     } finally {
+//         setTimeout(hideLoader, 1500);
+//     }
+// });
 
 /************ LOGOUT ************/
-document.getElementById('logout')?.addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = 'login.html'; // Redirect to login page
-});
+// document.getElementById('logout')?.addEventListener('click', () => {
+//     localStorage.removeItem('token');
+//     window.location.href = 'login.html'; // Redirect to login page
+// });
 /************ LOGOUT END ************/
 
 /************ PROFILE ************/
