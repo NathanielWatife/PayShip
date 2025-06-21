@@ -7,6 +7,7 @@ const socketIo = require('socket.io');
 const http = require('http');
 const jwt = require('jsonwebtoken');
 const Package = require('./models/Package'); 
+const path = require('path');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -21,10 +22,18 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+app.use(express.static(path.join(__dirname, 'frontend')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+})
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000', // Adjust as needed
+    credentials: true,
+}));
 app.use(helmet());
 
 
@@ -74,7 +83,6 @@ io.on('connection', (socket) => {
 });
 
 // Routes
-app.get('/', (req, res) => res.send('API is running...'));
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/packages', packageRoutes);
